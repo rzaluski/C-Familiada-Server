@@ -61,6 +61,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Answer.cs" />
+    <Compile Include="JMessage.cs" />
     <Compile Include="Question.cs" />
     <Compile Include="Table.xaml.cs">
       <DependentUpon>Table.xaml</DependentUpon>

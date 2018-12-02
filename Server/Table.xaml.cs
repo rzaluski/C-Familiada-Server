@@ -28,6 +28,26 @@ namespace Server
             InitializeComponent();
             tcpListener = _tcpListener;
             socket = _socket;
+
+            Task task = new Task(ListenToClient);
+            task.Start();
+
+            //StopListening();
+        }
+
+        private void ListenToClient()
+        {
+            byte[] b = new byte[100];
+            while(true)
+            {
+                int k = socket.Receive(b);
+                for (int i = 0; i < k; i++)
+                    Console.Write(Convert.ToChar(b[i]));
+            }
+        }
+
+        private void StopListening()
+        {
             socket.Close();
             tcpListener.Stop();
         }
