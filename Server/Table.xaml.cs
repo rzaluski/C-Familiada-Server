@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FamiliadaClientForms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -37,12 +38,16 @@ namespace Server
 
         private void ListenToClient()
         {
-            byte[] b = new byte[100];
+            byte[] b = new byte[1000];
             while(true)
             {
                 int k = socket.Receive(b);
-                for (int i = 0; i < k; i++)
-                    Console.Write(Convert.ToChar(b[i]));
+                string msgString = System.Text.Encoding.ASCII.GetString(b, 0, k);
+                JMessage msg = JMessage.Deserialize(msgString);
+                if(msg.MessageType == "TableCommand")
+                {
+                    TableCommand tableCommand = JMessage.Deserialize<TableCommand>(msg.ObjectJson);
+                }
             }
         }
 
