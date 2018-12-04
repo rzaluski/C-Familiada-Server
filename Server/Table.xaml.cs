@@ -1,6 +1,7 @@
 ﻿using FamiliadaClientForms;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -24,16 +25,34 @@ namespace Server
     {
         private TcpListener tcpListener;
         private Socket socket;
+
+        private List<Question> _questions = new List<Question>();
+        private Question _currentQuestion;
         public Table(TcpListener _tcpListener, Socket _socket)
         {
             InitializeComponent();
             tcpListener = _tcpListener;
             socket = _socket;
+            LoadQuestions();
 
             Task task = new Task(ListenToClient);
             task.Start();
 
             //StopListening();
+        }
+
+        private void LoadQuestions()
+        {
+            try
+            {
+                string filename = @"questions.json";
+                string json = File.ReadAllText(filename);
+                _questions = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Question>>(json);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         private void ListenToClient()
@@ -43,12 +62,40 @@ namespace Server
             {
                 int k = socket.Receive(b);
                 string msgString = System.Text.Encoding.ASCII.GetString(b, 0, k);
-                JMessage msg = JMessage.Deserialize(msgString);
-                if(msg.MessageType == "TableCommand")
-                {
-                    TableCommand tableCommand = JMessage.Deserialize<TableCommand>(msg.ObjectJson);
-                }
+                HandleMessage(msgString);
             }
+        }
+
+        private void HandleMessage(string msgString)
+        {
+            JMessage msg = JMessage.Deserialize(msgString);
+            if (msg.MessageType == "RandQuestion")
+            {
+                //TableCommand tableCommand = JMessage.Deserialize<TableCommand>(msg.ObjectJson);
+                Random r = new Random();
+                Question q = _questions[r.Next() % _questions.Count];
+                SendMessage("RandQuestion", q);
+                _currentQuestion = q;
+                NewQuestionOnTable();
+            }
+        }
+
+        private void NewQuestionOnTable()
+        {
+            for(int i=0; i < _currentQuestion.Answers.Count; i++)
+            {
+                Label l = new Label();
+                l.Content = i.ToString() + " ........................";
+                stackPanelAnswers.Children.Add(l);
+            }
+        }
+
+        private void SendMessage(string header, object obj)
+        {
+            string msgString = JMessage.CreateMessage(header, obj);
+            ASCIIEncoding asen = new ASCIIEncoding();
+            byte[] b = asen.GetBytes(msgString);
+            socket.Send(b);
         }
 
         private void StopListening()

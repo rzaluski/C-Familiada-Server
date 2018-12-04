@@ -26,14 +26,12 @@ namespace Server
     {
         public string IP { get; set; }
         public int Port { get; set; } = 6969;
-        public List<Question> Questions = new List<Question>();
         public MainWindow()
         {
             InitializeComponent();
             IP = GetLocalIPAddress();
             labelIP.DataContext = this;
             labelPort.DataContext = this;
-            LoadQuestions();
         }
         private static string GetLocalIPAddress()
         {
@@ -68,20 +66,7 @@ namespace Server
             }
         }
 
-        private void LoadQuestions()
-        {
-            try
-            {
-                string filename = @"questions.json";
-                string json = File.ReadAllText(filename);
-                Questions = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Question>>(json);
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-        }
+        
 
         private void ButtonOpenConnection_Click(object sender, RoutedEventArgs e)
         {
