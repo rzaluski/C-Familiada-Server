@@ -23,11 +23,19 @@ namespace Server
     /// </summary>
     public partial class Table : Page
     {
+        private enum Team
+        {
+            None,
+            First,
+            Second
+        }
+
         private TcpListener tcpListener;
         private Socket socket;
 
         private List<Question> _questions = new List<Question>();
         private Question _currentQuestion;
+        private Team _firstAnsweringTeam = Team.None;
         public Table(TcpListener _tcpListener, Socket _socket)
         {
             InitializeComponent();
@@ -75,13 +83,34 @@ namespace Server
                 Random r = new Random();
                 Question q = _questions[r.Next() % _questions.Count];
                 SendMessage("RandQuestion", q);
-                _currentQuestion = q;
-                NewQuestionOnTable();
+                NewQuestionOnTable(q);
+            }
+            else if(msg.MessageType == "FirstAnsweringTeam")
+            {
+                _firstAnsweringTeam = JMessage.Deserialize<Team>(msg.ObjectJson);
+            }
+            else if(msg.MessageType == "Answer")
+            {
+                int answerNumber = JMessage.Deserialize<int>(msg.ObjectJson);
+                if(answerNumber == -1)
+                {
+
+                }
+                else
+                {
+                    ShowAnswerOnTable(answerNumber);
+                }
             }
         }
 
-        private void NewQuestionOnTable()
+        private void ShowAnswerOnTable(int answerNumber)
         {
+            ((Label)stackPanelAnswers.Children[answerNumber]).Content = _currentQuestion.Answers[answerNumber].AnswerText;
+        }
+
+        private void NewQuestionOnTable(Question q)
+        {
+            _currentQuestion = q;
             for(int i=0; i < _currentQuestion.Answers.Count; i++)
             {
                 Label l = new Label();
