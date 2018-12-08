@@ -105,25 +105,38 @@ namespace Server
             {
                 _currentAnsweringTeam = JMessage.Deserialize<Team>(msg.ObjectJson);
             }
-            else if(msg.MessageType == "Answer")
+            else if(msg.MessageType == "CorrectAnswer")
             {
-                int answerNumber = JMessage.Deserialize<int>(msg.ObjectJson);
-                if(answerNumber == -1)
-                {
-                    ProceedUncorrectAnswer();
-                }
-                else
-                {
-                    ProceedCorrectAnswer(answerNumber);
-                }
+                Answer answer = JMessage.Deserialize<Answer>(msg.ObjectJson);
+                ProceedCorrectAnswer(GetAnswerNumber(answer));
+            }
+            else if(msg.MessageType == "IncorrectAnswer")
+            {
+                ProceedUncorrectAnswer();
             }
         }
 
+        private void SendIsGameOn(bool b)
+        {
+            SendMessage("IsGameOn", b);
+        }
+
+        private int GetAnswerNumber(Answer answer)
+        {
+            return _currentQuestion.Answers.FindIndex(c => c.AnswerText == answer.AnswerText);
+        }
+        private void ShowAnswer(int number)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                ((Label)stackPanelAnswers.Children[number]).Content = (number + 1).ToString() + " " + _currentQuestion.Answers[number].AnswerText + " " + _currentQuestion.Answers[number].Points;
+            });
+        }
         private void ProceedCorrectAnswer(int answerNumber)
         {
             _totalAnswers++;
             _correctAnswers++;
-            ((Label)stackPanelAnswers.Children[answerNumber]).Content = _currentQuestion.Answers[answerNumber].AnswerText;
+            ShowAnswer(answerNumber);
             int pointsToAdd = _currentQuestion.Answers[answerNumber].Points * _pointsMultiplier;
             _roundPoints += pointsToAdd;
             if(_totalAnswers == 1 && answerNumber == 0)
@@ -201,9 +214,12 @@ namespace Server
             _currentQuestion = q;
             for(int i=0; i < _currentQuestion.Answers.Count; i++)
             {
-                Label l = new Label();
-                l.Content = i.ToString() + " ........................";
-                stackPanelAnswers.Children.Add(l);
+                Dispatcher.Invoke(() =>
+                {
+                    Label l = new Label();
+                    l.Content = (i + 1).ToString() + " ........................";
+                    stackPanelAnswers.Children.Add(l);
+                });
             }
             NewRound();
         }
