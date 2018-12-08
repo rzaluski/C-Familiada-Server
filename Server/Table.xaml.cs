@@ -39,15 +39,17 @@ namespace Server
         private int _roundPoints;
         private int _round = 0;
         private int _pointsMultiplier = 1;
-        private List<int> _points = new List<int>{0, 0};
-        private Team _firstAnsweringTeam;
+        private int _totalAnswers;
+        private int _incorrectAnswers;
+        private List<int> _teamPoints = new List<int>{0, 0};
+        private Team _teamWonBattle;
+        private Team _currentAnsweringTeam;
         public Table(TcpListener _tcpListener, Socket _socket)
         {
             InitializeComponent();
             tcpListener = _tcpListener;
             socket = _socket;
             LoadQuestions();
-            NewRound();
             Task task = new Task(ListenToClient);
             task.Start();
 
@@ -71,8 +73,11 @@ namespace Server
         private void NewRound()
         {
             _correctAnswers = 0;
-            _firstAnsweringTeam = Team.None;
+            _incorrectAnswers = 0;
+            _totalAnswers = 0;
+            _currentAnsweringTeam = Team.None;
             _roundPoints = 0;
+            _teamWonBattle = Team.None;
         }
 
         private void ListenToClient()
@@ -91,7 +96,6 @@ namespace Server
             JMessage msg = JMessage.Deserialize(msgString);
             if (msg.MessageType == "RandQuestion")
             {
-                //TableCommand tableCommand = JMessage.Deserialize<TableCommand>(msg.ObjectJson);
                 Random r = new Random();
                 Question q = _questions[r.Next() % _questions.Count];
                 SendMessage("RandQuestion", q);
@@ -99,30 +103,97 @@ namespace Server
             }
             else if(msg.MessageType == "FirstAnsweringTeam")
             {
-                _firstAnsweringTeam = JMessage.Deserialize<Team>(msg.ObjectJson);
+                _currentAnsweringTeam = JMessage.Deserialize<Team>(msg.ObjectJson);
             }
             else if(msg.MessageType == "Answer")
             {
                 int answerNumber = JMessage.Deserialize<int>(msg.ObjectJson);
                 if(answerNumber == -1)
                 {
-
+                    ProceedUncorrectAnswer();
                 }
                 else
                 {
-                    ShowAnswerOnTable(answerNumber);
+                    ProceedCorrectAnswer(answerNumber);
                 }
             }
         }
 
-        private void ShowAnswerOnTable(int answerNumber)
+        private void ProceedCorrectAnswer(int answerNumber)
         {
+            _totalAnswers++;
+            _correctAnswers++;
             ((Label)stackPanelAnswers.Children[answerNumber]).Content = _currentQuestion.Answers[answerNumber].AnswerText;
-            _roundPoints += _currentQuestion.Answers[answerNumber].Points * _pointsMultiplier;
-            if(++_correctAnswers == _currentQuestion.Answers.Count)
+            int pointsToAdd = _currentQuestion.Answers[answerNumber].Points * _pointsMultiplier;
+            _roundPoints += pointsToAdd;
+            if(_totalAnswers == 1 && answerNumber == 0)
             {
-
+                _teamWonBattle = _currentAnsweringTeam;
             }
+            else if(_totalAnswers == 1 && answerNumber > 0)
+            {
+                _currentAnsweringTeam = GetOppositeTeam(_currentAnsweringTeam);
+            }
+            else if(_teamWonBattle == Team.None && _totalAnswers == 2)
+            {
+                if(_roundPoints - pointsToAdd > _roundPoints)
+                {
+                    _teamWonBattle = _currentAnsweringTeam;
+                }
+                else
+                {
+                    _teamWonBattle = GetOppositeTeam(_currentAnsweringTeam);
+                }
+            }
+            else if(_teamWonBattle == Team.None)
+            {
+                _teamWonBattle = _currentAnsweringTeam;
+            }
+            else if(_correctAnswers == _currentQuestion.Answers.Count || _currentAnsweringTeam != _teamWonBattle)
+            {
+                EndRound(_currentAnsweringTeam);
+            }
+        }
+
+        private void ProceedUncorrectAnswer()
+        {
+            _totalAnswers++;
+            _incorrectAnswers++;
+            if(_teamWonBattle != Team.None && _currentAnsweringTeam == _teamWonBattle)
+            {
+                ShowSmallX();
+            }
+            if(_teamWonBattle == Team.None || _currentAnsweringTeam != _teamWonBattle)
+            {
+                ShowFullX();
+                _currentAnsweringTeam = GetOppositeTeam(_currentAnsweringTeam);
+            }
+            if(_incorrectAnswers == 3)
+            {
+                _currentAnsweringTeam = GetOppositeTeam(_currentAnsweringTeam);
+            }
+            if(_incorrectAnswers == 4)
+            {
+                EndRound(GetOppositeTeam(_currentAnsweringTeam));
+            }
+        }
+
+        private void ShowFullX()
+        {
+        }
+
+        private void ShowSmallX()
+        {
+        }
+
+        private void EndRound(Team winningTeam)
+        {
+            _teamPoints[(int)winningTeam] += _roundPoints;
+        }
+
+        private Team GetOppositeTeam(Team currentTeam)
+        {
+            return currentTeam == Team.First ? Team.Second : Team.First;
         }
 
         private void NewQuestionOnTable(Question q)
@@ -134,6 +205,7 @@ namespace Server
                 l.Content = i.ToString() + " ........................";
                 stackPanelAnswers.Children.Add(l);
             }
+            NewRound();
         }
 
         private void SendMessage(string header, object obj)
