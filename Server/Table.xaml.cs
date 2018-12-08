@@ -25,9 +25,9 @@ namespace Server
     {
         private enum Team
         {
-            None,
             First,
-            Second
+            Second,
+            None
         }
 
         private TcpListener tcpListener;
@@ -35,14 +35,19 @@ namespace Server
 
         private List<Question> _questions = new List<Question>();
         private Question _currentQuestion;
-        private Team _firstAnsweringTeam = Team.None;
+        private int _correctAnswers;
+        private int _roundPoints;
+        private int _round = 0;
+        private int _pointsMultiplier = 1;
+        private List<int> _points = new List<int>{0, 0};
+        private Team _firstAnsweringTeam;
         public Table(TcpListener _tcpListener, Socket _socket)
         {
             InitializeComponent();
             tcpListener = _tcpListener;
             socket = _socket;
             LoadQuestions();
-
+            NewRound();
             Task task = new Task(ListenToClient);
             task.Start();
 
@@ -61,6 +66,13 @@ namespace Server
             {
                 throw ex;
             }
+        }
+
+        private void NewRound()
+        {
+            _correctAnswers = 0;
+            _firstAnsweringTeam = Team.None;
+            _roundPoints = 0;
         }
 
         private void ListenToClient()
@@ -106,6 +118,11 @@ namespace Server
         private void ShowAnswerOnTable(int answerNumber)
         {
             ((Label)stackPanelAnswers.Children[answerNumber]).Content = _currentQuestion.Answers[answerNumber].AnswerText;
+            _roundPoints += _currentQuestion.Answers[answerNumber].Points * _pointsMultiplier;
+            if(++_correctAnswers == _currentQuestion.Answers.Count)
+            {
+
+            }
         }
 
         private void NewQuestionOnTable(Question q)
