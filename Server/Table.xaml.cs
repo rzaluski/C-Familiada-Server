@@ -25,8 +25,8 @@ namespace Server
     {
         private enum Team
         {
-            First,
-            Second,
+            Left,
+            Right,
             None
         }
 
@@ -35,7 +35,7 @@ namespace Server
 
         private List<Question> _questions = new List<Question>();
         private Question _currentQuestion;
-        private bool _isGameOn;
+        private bool _isRoundOn;
         private int _correctAnswers;
         private int _roundPoints;
         private int _round = 0;
@@ -79,7 +79,7 @@ namespace Server
             _currentAnsweringTeam = Team.None;
             _roundPoints = 0;
             _teamWonBattle = Team.None;
-            _isGameOn = true;
+            _isRoundOn = true;
         }
 
         private void ListenToClient()
@@ -101,11 +101,15 @@ namespace Server
                 Random r = new Random();
                 Question q = _questions[r.Next() % _questions.Count];
                 SendMessage("RandQuestion", q);
-                NewQuestionOnTable(q);
+                _currentQuestion = q;
+            }
+            else if(msg.MessageType == "SubmitQuestion")
+            {
+                NewQuestionOnTable(_currentQuestion);
             }
             else if(msg.MessageType == "FirstAnsweringTeam")
             {
-                _currentAnsweringTeam = JMessage.Deserialize<Team>(msg.ObjectJson);
+                _currentAnsweringTeam = (Team)JMessage.Deserialize<int>(msg.ObjectJson);
             }
             else if(msg.MessageType == "CorrectAnswer")
             {
@@ -134,7 +138,7 @@ namespace Server
         private void ProceedCorrectAnswer(int answerNumber)
         {
             ShowAnswer(answerNumber);
-            if(_isGameOn)
+            if(_isRoundOn)
             {
                 _totalAnswers++;
                 _correctAnswers++;
@@ -167,14 +171,28 @@ namespace Server
                 {
                     EndRound(_currentAnsweringTeam);
                 }
-                SendMessage("IsGameOn", _isGameOn);
+                SendMessage("IsRoundOn", _isRoundOn);
+                UpdatePoints();
             }
+        }
+
+        private void UpdatePoints()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                labelTop.Content = _roundPoints;
+                labelLeft.Content = _teamPoints[(int)Team.Left];
+                labelRight.Content = _teamPoints[(int)Team.Right];
+            });
         }
 
         private void ProceedUncorrectAnswer()
         {
             _totalAnswers++;
-            _incorrectAnswers++;
+            if(_teamWonBattle != Team.None)
+            {
+                _incorrectAnswers++;
+            }
             if(_teamWonBattle != Team.None && _currentAnsweringTeam == _teamWonBattle)
             {
                 ShowSmallX();
@@ -191,8 +209,9 @@ namespace Server
             if(_incorrectAnswers == 4)
             {
                 EndRound(GetOppositeTeam(_currentAnsweringTeam));
+                UpdatePoints();
             }
-            SendMessage("IsGameOn", _isGameOn);
+            SendMessage("IsRoundOn", _isRoundOn);
         }
 
         private void ShowFullX()
@@ -206,16 +225,17 @@ namespace Server
         private void EndRound(Team winningTeam)
         {
             _teamPoints[(int)winningTeam] += _roundPoints;
+            _roundPoints = 0;
+            _isRoundOn = false;
         }
 
         private Team GetOppositeTeam(Team currentTeam)
         {
-            return currentTeam == Team.First ? Team.Second : Team.First;
+            return currentTeam == Team.Left ? Team.Right : Team.Left;
         }
 
         private void NewQuestionOnTable(Question q)
         {
-            _currentQuestion = q;
             for(int i=0; i < _currentQuestion.Answers.Count; i++)
             {
                 Dispatcher.Invoke(() =>

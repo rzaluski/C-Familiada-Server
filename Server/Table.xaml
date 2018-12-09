@@ -7,21 +7,17 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Table">
-
-    <StackPanel Orientation="Vertical">
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="50px">
-            <Label Content="Punkty"/>
+    <DockPanel LastChildFill="True">
+        <StackPanel DockPanel.Dock="Left" Width="100px" Orientation="Horizontal">
+            <Label Name="labelLeft" VerticalAlignment="Center" HorizontalAlignment="Left" Content="0"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="50px">
-                <Label Content="Punkty"/>
-            </StackPanel>
-            <StackPanel Name="stackPanelAnswers" Orientation="Vertical" HorizontalAlignment="Stretch">
-
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="50px">
-                <Label Content="Punkty"/>
-            </StackPanel>
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Width="100px" FlowDirection="RightToLeft">
+            <Label Name="labelRight" VerticalAlignment="Center" HorizontalAlignment="Right" Content="0"/>
         </StackPanel>
-    </StackPanel>
+        <StackPanel DockPanel.Dock="Top">
+            <Label Name="labelTop" Content="0" HorizontalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Name="stackPanelAnswers" Orientation="Vertical" HorizontalAlignment="Center">
+        </StackPanel>
+    </DockPanel>
 </Page>
