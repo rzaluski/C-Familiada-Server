@@ -192,6 +192,7 @@ namespace Server
             {
                 EndRound(GetOppositeTeam(_currentAnsweringTeam));
             }
+            SendMessage("IsGameOn", _isGameOn);
         }
 
         private void ShowFullX()
