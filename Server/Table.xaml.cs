@@ -35,6 +35,7 @@ namespace Server
 
         private List<Question> _questions = new List<Question>();
         private Question _currentQuestion;
+        private bool _isGameOn;
         private int _correctAnswers;
         private int _roundPoints;
         private int _round = 0;
@@ -78,6 +79,7 @@ namespace Server
             _currentAnsweringTeam = Team.None;
             _roundPoints = 0;
             _teamWonBattle = Team.None;
+            _isGameOn = true;
         }
 
         private void ListenToClient()
@@ -116,10 +118,7 @@ namespace Server
             }
         }
 
-        private void SendIsGameOn(bool b)
-        {
-            SendMessage("IsGameOn", b);
-        }
+      
 
         private int GetAnswerNumber(Answer answer)
         {
@@ -134,37 +133,41 @@ namespace Server
         }
         private void ProceedCorrectAnswer(int answerNumber)
         {
-            _totalAnswers++;
-            _correctAnswers++;
             ShowAnswer(answerNumber);
-            int pointsToAdd = _currentQuestion.Answers[answerNumber].Points * _pointsMultiplier;
-            _roundPoints += pointsToAdd;
-            if(_totalAnswers == 1 && answerNumber == 0)
+            if(_isGameOn)
             {
-                _teamWonBattle = _currentAnsweringTeam;
-            }
-            else if(_totalAnswers == 1 && answerNumber > 0)
-            {
-                _currentAnsweringTeam = GetOppositeTeam(_currentAnsweringTeam);
-            }
-            else if(_teamWonBattle == Team.None && _totalAnswers == 2)
-            {
-                if(_roundPoints - pointsToAdd > _roundPoints)
+                _totalAnswers++;
+                _correctAnswers++;
+                int pointsToAdd = _currentQuestion.Answers[answerNumber].Points * _pointsMultiplier;
+                _roundPoints += pointsToAdd;
+                if (_totalAnswers == 1 && answerNumber == 0)
                 {
                     _teamWonBattle = _currentAnsweringTeam;
                 }
-                else
+                else if (_totalAnswers == 1 && answerNumber > 0)
                 {
-                    _teamWonBattle = GetOppositeTeam(_currentAnsweringTeam);
+                    _currentAnsweringTeam = GetOppositeTeam(_currentAnsweringTeam);
                 }
-            }
-            else if(_teamWonBattle == Team.None)
-            {
-                _teamWonBattle = _currentAnsweringTeam;
-            }
-            else if(_correctAnswers == _currentQuestion.Answers.Count || _currentAnsweringTeam != _teamWonBattle)
-            {
-                EndRound(_currentAnsweringTeam);
+                else if (_teamWonBattle == Team.None && _totalAnswers == 2)
+                {
+                    if (_roundPoints - pointsToAdd > _roundPoints)
+                    {
+                        _teamWonBattle = _currentAnsweringTeam;
+                    }
+                    else
+                    {
+                        _teamWonBattle = GetOppositeTeam(_currentAnsweringTeam);
+                    }
+                }
+                else if (_teamWonBattle == Team.None)
+                {
+                    _teamWonBattle = _currentAnsweringTeam;
+                }
+                else if (_correctAnswers == _currentQuestion.Answers.Count || _currentAnsweringTeam != _teamWonBattle)
+                {
+                    EndRound(_currentAnsweringTeam);
+                }
+                SendMessage("IsGameOn", _isGameOn);
             }
         }
 
