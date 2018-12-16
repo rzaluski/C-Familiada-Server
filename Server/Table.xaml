@@ -7,17 +7,17 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Table">
-    <DockPanel LastChildFill="True">
+    <DockPanel LastChildFill="True" Background="Black">
         <StackPanel DockPanel.Dock="Left" Width="100px" Orientation="Horizontal">
-            <Label Name="labelLeft" VerticalAlignment="Center" HorizontalAlignment="Left" Content="0"/>
+            <Label Name="labelLeft" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="Yellow" FontSize="40" Content="0" Style="{StaticResource points}"/>
         </StackPanel>
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Width="100px" FlowDirection="RightToLeft">
-            <Label Name="labelRight" VerticalAlignment="Center" HorizontalAlignment="Right" Content="0"/>
+            <Label Name="labelRight" VerticalAlignment="Center" HorizontalAlignment="Right" Content="0" Foreground="Yellow" FontSize="40" Style="{StaticResource points}"/>
         </StackPanel>
         <StackPanel DockPanel.Dock="Top">
-            <Label Name="labelTop" Content="0" HorizontalAlignment="Center"/>
+            <Label Name="labelTop" Foreground="Yellow" FontSize="40" Content="0" HorizontalAlignment="Center" Style="{StaticResource points}"/>
         </StackPanel>
-        <StackPanel Name="stackPanelAnswers" Orientation="Vertical" HorizontalAlignment="Center">
-        </StackPanel>
+        <DockPanel Name="dockPanelAnswers" Margin="0,100,0,0" >
+        </DockPanel>
     </DockPanel>
 </Page>

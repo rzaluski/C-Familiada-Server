@@ -4,6 +4,15 @@
              xmlns:local="clr-namespace:Server"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <Style x:Key="answers">
+            <Setter Property="TextElement.FontFamily" Value="Resources/subway-ticker.regular.ttf#Subway Ticker"/>
+            <Setter Property="TextElement.FontSize" Value="40"/>
+            <Setter Property="TextElement.Foreground" Value="Yellow"/>
+        </Style>
+        <Style x:Key="points">
+            <Setter Property="TextElement.FontFamily" Value="Resources/subway-ticker.regular.ttf#Subway Ticker"/>
+            <Setter Property="TextElement.FontSize" Value="50"/>
+            <Setter Property="TextElement.Foreground" Value="Yellow"/>
+        </Style>
     </Application.Resources>
 </Application>

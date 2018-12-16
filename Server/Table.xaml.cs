@@ -12,6 +12,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -73,6 +74,7 @@ namespace Server
 
         private void NewRound()
         {
+            _round++;
             _correctAnswers = 0;
             _incorrectAnswers = 0;
             _totalAnswers = 0;
@@ -105,7 +107,7 @@ namespace Server
             }
             else if(msg.MessageType == "SubmitQuestion")
             {
-                NewQuestionOnTable(_currentQuestion);
+                NewQuestion(_currentQuestion);
             }
             else if(msg.MessageType == "FirstAnsweringTeam")
             {
@@ -132,7 +134,33 @@ namespace Server
         {
             Dispatcher.Invoke(() =>
             {
-                ((Label)stackPanelAnswers.Children[number]).Content = (number + 1).ToString() + " " + _currentQuestion.Answers[number].AnswerText + " " + _currentQuestion.Answers[number].Points;
+                Label labelAnswer = (Label)((DockPanel)dockPanelAnswers.Children[number]).Children[2];
+                labelAnswer.Content = _currentQuestion.Answers[number].AnswerText;
+                DoubleAnimation answerAnimation = new DoubleAnimation();
+                answerAnimation.From = 0;
+                answerAnimation.To = labelAnswer.ActualWidth;
+                answerAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(500));
+
+                Storyboard.SetTarget(answerAnimation, labelAnswer);
+                Storyboard.SetTargetProperty(answerAnimation, new PropertyPath(Label.WidthProperty));
+
+                Storyboard myWidthAnimatedLabelStoryboard = new Storyboard();
+                myWidthAnimatedLabelStoryboard.Children.Add(answerAnimation);
+                myWidthAnimatedLabelStoryboard.Begin(labelAnswer);
+
+                Label labelPoints = (Label)((Grid)((DockPanel)dockPanelAnswers.Children[number]).Children[1]).Children[0];
+                labelPoints.Content = _currentQuestion.Answers[number].Points;
+                DoubleAnimation pointsAnimation = new DoubleAnimation();
+                pointsAnimation.From = 0;
+                pointsAnimation.To = labelPoints.ActualWidth;
+                pointsAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(200));
+                pointsAnimation.BeginTime = TimeSpan.FromMilliseconds(500);
+                Storyboard.SetTarget(pointsAnimation, labelPoints);
+                Storyboard.SetTargetProperty(pointsAnimation, new PropertyPath(Label.WidthProperty));
+
+                labelPoints.Width = 0;
+                myWidthAnimatedLabelStoryboard.Children.Add(pointsAnimation);
+                myWidthAnimatedLabelStoryboard.Begin(labelPoints);
             });
         }
         private void ProceedCorrectAnswer(int answerNumber)
@@ -234,15 +262,43 @@ namespace Server
             return currentTeam == Team.Left ? Team.Right : Team.Left;
         }
 
-        private void NewQuestionOnTable(Question q)
+        private void NewQuestion(Question q)
         {
             for(int i=0; i < _currentQuestion.Answers.Count; i++)
             {
                 Dispatcher.Invoke(() =>
                 {
-                    Label l = new Label();
-                    l.Content = (i + 1).ToString() + " ........................";
-                    stackPanelAnswers.Children.Add(l);
+                    dockPanelAnswers.Children.Clear();
+
+                    DockPanel dockPanel = new DockPanel();
+
+                    Label labelNumber = new Label();
+                    labelNumber.Width = 50;
+                    labelNumber.Content = i + 1;
+                    labelNumber.Style = (Style)FindResource("answers");
+                    DockPanel.SetDock(labelNumber, Dock.Left);
+
+                    Grid pointsContainer = new Grid();
+                    pointsContainer.Width = 100;
+                    Label labelPoints = new Label();
+                    labelPoints.Width = 100;
+                    labelPoints.Content = "--";
+                    labelPoints.Style = (Style)FindResource("answers");
+                    labelPoints.HorizontalAlignment = HorizontalAlignment.Left;
+                    pointsContainer.Children.Add(labelPoints);
+                    DockPanel.SetDock(pointsContainer, Dock.Right);
+
+                    Label labelAnswer = new Label();
+                    labelAnswer.Style = (Style)FindResource("answers");
+                    labelAnswer.Content = "........................";
+                    labelAnswer.HorizontalAlignment = HorizontalAlignment.Left;
+
+                    dockPanel.Children.Add(labelNumber);
+                    dockPanel.Children.Add(pointsContainer);
+                    dockPanel.Children.Add(labelAnswer);
+
+                    DockPanel.SetDock(dockPanel, Dock.Top);
+                    dockPanelAnswers.Children.Add(dockPanel);
                 });
             }
             NewRound();
