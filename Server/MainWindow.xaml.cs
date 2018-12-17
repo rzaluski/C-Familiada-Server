@@ -26,6 +26,7 @@ namespace Server
     {
         public string IP { get; set; }
         public int Port { get; set; } = 6969;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -33,6 +34,7 @@ namespace Server
             labelIP.DataContext = this;
             labelPort.DataContext = this;
         }
+
         private static string GetLocalIPAddress()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
@@ -45,6 +47,7 @@ namespace Server
             }
             throw new Exception("No network adapters with an IPv4 address in the system!");
         }
+
         private void OpenConnection()
         {
             try
@@ -66,13 +69,11 @@ namespace Server
             }
         }
 
-        
-
         private void ButtonOpenConnection_Click(object sender, RoutedEventArgs e)
         {
             buttonOpenConnection.Visibility = Visibility.Collapsed;
             stackPanelWaiting.Visibility = Visibility.Visible;
-            new Thread(OpenConnection).Start();
+            new Task(OpenConnection).Start();
         }
     }
 }

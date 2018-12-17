@@ -9,15 +9,15 @@
       Title="Table">
     <DockPanel LastChildFill="True" Background="Black">
         <StackPanel DockPanel.Dock="Left" Width="100px" Orientation="Horizontal">
-            <Label Name="labelLeft" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="Yellow" FontSize="40" Content="0" Style="{StaticResource points}"/>
+            <Label Name="labelLeft" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="Yellow" Content="0" Style="{StaticResource points}"/>
         </StackPanel>
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Width="100px" FlowDirection="RightToLeft">
-            <Label Name="labelRight" VerticalAlignment="Center" HorizontalAlignment="Right" Content="0" Foreground="Yellow" FontSize="40" Style="{StaticResource points}"/>
+            <Label Name="labelRight" VerticalAlignment="Center" HorizontalAlignment="Right" Content="0" Foreground="Yellow" Style="{StaticResource points}"/>
         </StackPanel>
         <StackPanel DockPanel.Dock="Top">
-            <Label Name="labelTop" Foreground="Yellow" FontSize="40" Content="0" HorizontalAlignment="Center" Style="{StaticResource points}"/>
+            <Label Name="labelTop" Foreground="Yellow" Content="0" HorizontalAlignment="Center" Style="{StaticResource points}"/>
         </StackPanel>
-        <DockPanel Name="dockPanelAnswers" Margin="0,100,0,0" >
+        <DockPanel Name="dockPanelAnswers" Margin="0,100,0,0" HorizontalAlignment="Center">
         </DockPanel>
     </DockPanel>
 </Page>

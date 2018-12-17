@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:Server"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525"
+        WindowState="Maximized"
+        WindowStyle="None">
     <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
         <Grid>
             <Grid.RowDefinitions>

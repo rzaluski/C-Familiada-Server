@@ -124,8 +124,6 @@ namespace Server
             }
         }
 
-      
-
         private int GetAnswerNumber(Answer answer)
         {
             return _currentQuestion.Answers.FindIndex(c => c.AnswerText == answer.AnswerText);
@@ -202,6 +200,11 @@ namespace Server
                 SendMessage("IsRoundOn", _isRoundOn);
                 UpdatePoints();
             }
+            PlayCorrectAnswerSound();
+            if (_isRoundOn)
+            {
+                PlayClaps(1000);
+            }
         }
 
         private void UpdatePoints()
@@ -240,6 +243,7 @@ namespace Server
                 UpdatePoints();
             }
             SendMessage("IsRoundOn", _isRoundOn);
+            PlayWrongAnswerSound();
         }
 
         private void ShowFullX()
@@ -248,6 +252,32 @@ namespace Server
 
         private void ShowSmallX()
         {
+            
+        }
+
+        private void PlayWrongAnswerSound()
+        {
+            System.IO.Stream str = Properties.Resources.wronganswer;
+            System.Media.SoundPlayer snd = new System.Media.SoundPlayer(str);
+            snd.Play();
+        }
+
+        private void PlayCorrectAnswerSound()
+        {
+            System.IO.Stream str = Properties.Resources.correctanswer;
+            System.Media.SoundPlayer snd = new System.Media.SoundPlayer(str);
+            snd.Play();
+        }
+
+        private void PlayClaps(int delayMiliseconds)
+        {
+            new Task(() =>
+            {
+                System.Threading.Thread.Sleep(delayMiliseconds);
+                System.IO.Stream str = Properties.Resources.claps;
+                System.Media.SoundPlayer snd = new System.Media.SoundPlayer(str);
+                snd.Play();
+            }).Start();
         }
 
         private void EndRound(Team winningTeam)
@@ -264,16 +294,16 @@ namespace Server
 
         private void NewQuestion(Question q)
         {
-            for(int i=0; i < _currentQuestion.Answers.Count; i++)
+            Dispatcher.Invoke(() =>
             {
-                Dispatcher.Invoke(() =>
-                {
-                    dockPanelAnswers.Children.Clear();
+                dockPanelAnswers.Children.Clear();
 
+                for (int i = 0; i < _currentQuestion.Answers.Count; i++)
+                {
                     DockPanel dockPanel = new DockPanel();
 
                     Label labelNumber = new Label();
-                    labelNumber.Width = 50;
+                    labelNumber.Width = 100;
                     labelNumber.Content = i + 1;
                     labelNumber.Style = (Style)FindResource("answers");
                     DockPanel.SetDock(labelNumber, Dock.Left);
@@ -290,7 +320,7 @@ namespace Server
 
                     Label labelAnswer = new Label();
                     labelAnswer.Style = (Style)FindResource("answers");
-                    labelAnswer.Content = "........................";
+                    labelAnswer.Content = "................................................";
                     labelAnswer.HorizontalAlignment = HorizontalAlignment.Left;
 
                     dockPanel.Children.Add(labelNumber);
@@ -299,8 +329,8 @@ namespace Server
 
                     DockPanel.SetDock(dockPanel, Dock.Top);
                     dockPanelAnswers.Children.Add(dockPanel);
-                });
-            }
+                }
+            });
             NewRound();
         }
 
