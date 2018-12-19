@@ -1,6 +1,7 @@
 ﻿using FamiliadaClientForms;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -11,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
@@ -133,7 +135,7 @@ namespace Server
             Dispatcher.Invoke(() =>
             {
                 Label labelAnswer = (Label)((DockPanel)dockPanelAnswers.Children[number]).Children[2];
-                labelAnswer.Content = _currentQuestion.Answers[number].AnswerText;
+                labelAnswer.Content = _currentQuestion.Answers[number].AnswerText.ToUpper();
                 DoubleAnimation answerAnimation = new DoubleAnimation();
                 answerAnimation.From = 0;
                 answerAnimation.To = labelAnswer.ActualWidth;
@@ -180,13 +182,13 @@ namespace Server
                 }
                 else if (_teamWonBattle == Team.None && _totalAnswers == 2)
                 {
-                    if (_roundPoints - pointsToAdd > _roundPoints)
+                    if (_roundPoints - pointsToAdd > pointsToAdd)
                     {
-                        _teamWonBattle = _currentAnsweringTeam;
+                        _teamWonBattle = GetOppositeTeam(_currentAnsweringTeam);
                     }
                     else
                     {
-                        _teamWonBattle = GetOppositeTeam(_currentAnsweringTeam);
+                        _teamWonBattle = _currentAnsweringTeam;
                     }
                 }
                 else if (_teamWonBattle == Team.None)
@@ -219,6 +221,7 @@ namespace Server
 
         private void ProceedUncorrectAnswer()
         {
+            Team teamAnswered = _currentAnsweringTeam;
             _totalAnswers++;
             if(_teamWonBattle != Team.None)
             {
@@ -239,7 +242,7 @@ namespace Server
             }
             if(_incorrectAnswers == 4)
             {
-                EndRound(GetOppositeTeam(_currentAnsweringTeam));
+                EndRound(GetOppositeTeam(teamAnswered));
                 UpdatePoints();
             }
             SendMessage("IsRoundOn", _isRoundOn);
@@ -248,6 +251,42 @@ namespace Server
 
         private void ShowFullX()
         {
+            Dispatcher.Invoke(()=>
+            {
+                System.Windows.Controls.Image img = new System.Windows.Controls.Image();
+                img.Source = Utils.ImageSourceForBitmap(Properties.Resources.bigX);
+                img.Stretch = Stretch.None;
+                img.VerticalAlignment = VerticalAlignment.Top;
+                if (_currentAnsweringTeam == Team.Left)
+                {
+                    stackPanelLeftX.Children.Clear();
+                    Grid grid = new Grid();
+                    grid.Height = Properties.Resources.bigX.Height;
+                    grid.Children.Add(img);
+                    stackPanelLeftX.Children.Add(grid);
+                    stackPanelLeftX.VerticalAlignment = VerticalAlignment.Center;
+                }
+                else
+                {
+                    stackPanelRightX.Children.Clear();
+                    Grid grid = new Grid();
+                    grid.Height = Properties.Resources.bigX.Height;
+                    grid.Children.Add(img);
+                    stackPanelRightX.Children.Add(grid);
+                    stackPanelRightX.VerticalAlignment = VerticalAlignment.Center;
+                }
+                DoubleAnimation imgAnimation = new DoubleAnimation();
+                imgAnimation.From = 0;
+                imgAnimation.To = Properties.Resources.bigX.Height;
+                imgAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(300));
+
+                Storyboard.SetTarget(imgAnimation, img);
+                Storyboard.SetTargetProperty(imgAnimation, new PropertyPath(System.Windows.Controls.Image.HeightProperty));
+
+                Storyboard imgStoryboard = new Storyboard();
+                imgStoryboard.Children.Add(imgAnimation);
+                imgStoryboard.Begin(img);
+            });
         }
 
         private void ShowSmallX()

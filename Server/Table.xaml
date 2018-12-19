@@ -11,8 +11,14 @@
         <StackPanel DockPanel.Dock="Left" Width="100px" Orientation="Horizontal">
             <Label Name="labelLeft" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="Yellow" Content="0" Style="{StaticResource points}"/>
         </StackPanel>
+        <StackPanel Name="stackPanelLeftX" DockPanel.Dock="Left" Width="150px" Orientation="Vertical">
+            
+        </StackPanel>
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Width="100px" FlowDirection="RightToLeft">
             <Label Name="labelRight" VerticalAlignment="Center" HorizontalAlignment="Right" Content="0" Foreground="Yellow" Style="{StaticResource points}"/>
+        </StackPanel>
+        <StackPanel Name="stackPanelRightX" DockPanel.Dock="Right" Width="150px" Orientation="Vertical">
+
         </StackPanel>
         <StackPanel DockPanel.Dock="Top">
             <Label Name="labelTop" Foreground="Yellow" Content="0" HorizontalAlignment="Center" Style="{StaticResource points}"/>
