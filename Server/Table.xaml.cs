@@ -166,8 +166,10 @@ namespace Server
         private void ProceedCorrectAnswer(int answerNumber)
         {
             ShowAnswer(answerNumber);
+            PlayCorrectAnswerSound();
             if(_isRoundOn)
             {
+                PlayClapsWithDelay(1000);
                 _totalAnswers++;
                 _correctAnswers++;
                 int pointsToAdd = _currentQuestion.Answers[answerNumber].Points * _pointsMultiplier;
@@ -190,32 +192,39 @@ namespace Server
                     {
                         _teamWonBattle = _currentAnsweringTeam;
                     }
+                    ClearXPanels();
                 }
                 else if (_teamWonBattle == Team.None)
                 {
                     _teamWonBattle = _currentAnsweringTeam;
+                    ClearXPanels();
                 }
                 else if (_correctAnswers == _currentQuestion.Answers.Count || _currentAnsweringTeam != _teamWonBattle)
                 {
+                    _roundPoints -= pointsToAdd;
                     EndRound(_currentAnsweringTeam);
                 }
                 SendMessage("IsRoundOn", _isRoundOn);
                 UpdatePoints();
             }
-            PlayCorrectAnswerSound();
-            if (_isRoundOn)
+        }
+
+        private void ClearXPanels()
+        {
+            Dispatcher.Invoke(() =>
             {
-                PlayClaps(1000);
-            }
+                stackPanelLeftX.Children.Clear();
+                stackPanelRightX.Children.Clear();
+            });
         }
 
         private void UpdatePoints()
         {
             Dispatcher.Invoke(() =>
             {
-                labelTop.Content = _roundPoints;
-                labelLeft.Content = _teamPoints[(int)Team.Left];
-                labelRight.Content = _teamPoints[(int)Team.Right];
+                labelPointsTop.Content = _roundPoints;
+                labelPointsLeft.Content = _teamPoints[(int)Team.Left];
+                labelPointsRight.Content = _teamPoints[(int)Team.Right];
             });
         }
 
@@ -229,7 +238,7 @@ namespace Server
             }
             if(_teamWonBattle != Team.None && _currentAnsweringTeam == _teamWonBattle)
             {
-                ShowSmallX();
+                ShowSmallX(teamAnswered);
             }
             if(_teamWonBattle == Team.None || _currentAnsweringTeam != _teamWonBattle)
             {
@@ -289,9 +298,41 @@ namespace Server
             });
         }
 
-        private void ShowSmallX()
+        private void ShowSmallX(Team teamAnswered)
         {
-            
+            Dispatcher.Invoke(() =>
+            {
+                StackPanel stackPanel = teamAnswered == Team.Left ? stackPanelLeftX : stackPanelRightX;
+                if (stackPanel.Children.Count == 0)
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        Grid grid = new Grid();
+                        grid.Height = Properties.Resources.smallX.Height;
+                        grid.VerticalAlignment = VerticalAlignment.Center;
+                        grid.Margin = new Thickness() { Bottom = 10 };
+                        stackPanel.Children.Add(grid);
+                    }
+
+                }
+                System.Windows.Controls.Image img = new System.Windows.Controls.Image();
+                img.Source = Utils.ImageSourceForBitmap(Properties.Resources.smallX);
+                img.Stretch = Stretch.None;
+                img.VerticalAlignment = VerticalAlignment.Top;
+                ((Grid)stackPanel.Children[_incorrectAnswers - 1]).Children.Add(img);
+
+                DoubleAnimation imgAnimation = new DoubleAnimation();
+                imgAnimation.From = 0;
+                imgAnimation.To = Properties.Resources.smallX.Height;
+                imgAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(300));
+
+                Storyboard.SetTarget(imgAnimation, img);
+                Storyboard.SetTargetProperty(imgAnimation, new PropertyPath(System.Windows.Controls.Image.HeightProperty));
+
+                Storyboard imgStoryboard = new Storyboard();
+                imgStoryboard.Children.Add(imgAnimation);
+                imgStoryboard.Begin(img);
+            });
         }
 
         private void PlayWrongAnswerSound()
@@ -308,7 +349,7 @@ namespace Server
             snd.Play();
         }
 
-        private void PlayClaps(int delayMiliseconds)
+        private void PlayClapsWithDelay(int delayMiliseconds)
         {
             new Task(() =>
             {
@@ -336,6 +377,7 @@ namespace Server
             Dispatcher.Invoke(() =>
             {
                 dockPanelAnswers.Children.Clear();
+                ClearXPanels();
 
                 for (int i = 0; i < _currentQuestion.Answers.Count; i++)
                 {

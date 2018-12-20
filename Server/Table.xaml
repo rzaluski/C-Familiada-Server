@@ -8,20 +8,20 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Table">
     <DockPanel LastChildFill="True" Background="Black">
-        <StackPanel DockPanel.Dock="Left" Width="100px" Orientation="Horizontal">
-            <Label Name="labelLeft" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="Yellow" Content="0" Style="{StaticResource points}"/>
+        <StackPanel Name="stackPanelPointsLeft" DockPanel.Dock="Left" Width="150px" Orientation="Horizontal">
+            <Label Name="labelPointsLeft" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="Yellow" Content="0" Style="{StaticResource points}"/>
         </StackPanel>
-        <StackPanel Name="stackPanelLeftX" DockPanel.Dock="Left" Width="150px" Orientation="Vertical">
+        <StackPanel Name="stackPanelLeftX" DockPanel.Dock="Left" Width="150px" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
             
         </StackPanel>
-        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Width="100px" FlowDirection="RightToLeft">
-            <Label Name="labelRight" VerticalAlignment="Center" HorizontalAlignment="Right" Content="0" Foreground="Yellow" Style="{StaticResource points}"/>
+        <StackPanel Name="stackPanelPointsRight" DockPanel.Dock="Right" Orientation="Horizontal" Width="150px" FlowDirection="RightToLeft">
+            <Label Name="labelPointsRight" VerticalAlignment="Center" HorizontalAlignment="Right" Content="0" Foreground="Yellow" Style="{StaticResource points}"/>
         </StackPanel>
-        <StackPanel Name="stackPanelRightX" DockPanel.Dock="Right" Width="150px" Orientation="Vertical">
+        <StackPanel Name="stackPanelRightX" DockPanel.Dock="Right" Width="150px" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
 
         </StackPanel>
-        <StackPanel DockPanel.Dock="Top">
-            <Label Name="labelTop" Foreground="Yellow" Content="0" HorizontalAlignment="Center" Style="{StaticResource points}"/>
+        <StackPanel Name="stackPanelPointsTop" DockPanel.Dock="Top">
+            <Label Name="labelPointsTop" Foreground="Yellow" Content="0" HorizontalAlignment="Center" Style="{StaticResource points}"/>
         </StackPanel>
         <DockPanel Name="dockPanelAnswers" Margin="0,100,0,0" HorizontalAlignment="Center">
         </DockPanel>
