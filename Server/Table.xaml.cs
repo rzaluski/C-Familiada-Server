@@ -114,6 +114,7 @@ namespace Server
             else if(msg.MessageType == "FirstAnsweringTeam")
             {
                 _currentAnsweringTeam = (Team)JMessage.Deserialize<int>(msg.ObjectJson);
+                SendMessage("Confirm", null);
             }
             else if(msg.MessageType == "CorrectAnswer")
             {
