@@ -84,6 +84,7 @@ namespace Server
             _roundPoints = 0;
             _teamWonBattle = Team.None;
             _isRoundOn = true;
+            PlaySound(Properties.Resources.roundsound);
         }
 
         private void ListenToClient()
@@ -369,6 +370,7 @@ namespace Server
             _teamPoints[(int)winningTeam] += _roundPoints;
             _roundPoints = 0;
             _isRoundOn = false;
+            PlaySoundWithDelay(Properties.Resources.roundsound, 2000);
         }
 
         private Team GetOppositeTeam(Team currentTeam)
