@@ -56,7 +56,7 @@ namespace Server
             LoadQuestions();
             Task task = new Task(ListenToClient);
             task.Start();
-
+            PlaySound(Properties.Resources.intro);
             //StopListening();
         }
 
@@ -167,7 +167,7 @@ namespace Server
         private void ProceedCorrectAnswer(int answerNumber)
         {
             ShowAnswer(answerNumber);
-            PlayCorrectAnswerSound();
+            PlaySound(Properties.Resources.correctanswer);
             if(_isRoundOn)
             {
                 PlayClapsWithDelay(1000);
@@ -256,7 +256,7 @@ namespace Server
                 UpdatePoints();
             }
             SendMessage("IsRoundOn", _isRoundOn);
-            PlayWrongAnswerSound();
+            PlaySound(Properties.Resources.wronganswer);
         }
 
         private void ShowFullX()
@@ -336,18 +336,20 @@ namespace Server
             });
         }
 
-        private void PlayWrongAnswerSound()
+
+        private void PlaySound(System.IO.Stream sound)
         {
-            System.IO.Stream str = Properties.Resources.wronganswer;
-            System.Media.SoundPlayer snd = new System.Media.SoundPlayer(str);
+            System.Media.SoundPlayer snd = new System.Media.SoundPlayer(sound);
             snd.Play();
         }
 
-        private void PlayCorrectAnswerSound()
+        private void PlaySoundWithDelay(System.IO.Stream sound, int delayMiliseconds)
         {
-            System.IO.Stream str = Properties.Resources.correctanswer;
-            System.Media.SoundPlayer snd = new System.Media.SoundPlayer(str);
-            snd.Play();
+            new Task(() =>
+            {
+                System.Threading.Thread.Sleep(delayMiliseconds);
+                PlaySound(sound);
+            }).Start();
         }
 
         private void PlayClapsWithDelay(int delayMiliseconds)
@@ -360,6 +362,7 @@ namespace Server
                 snd.Play();
             }).Start();
         }
+
 
         private void EndRound(Team winningTeam)
         {
@@ -377,6 +380,12 @@ namespace Server
         {
             Dispatcher.Invoke(() =>
             {
+                if(stackPanelLogoText.Visibility == Visibility.Visible)
+                {
+                    stackPanelLogoText.Visibility = Visibility.Collapsed;
+                    dockPanelMainContent.Visibility = Visibility.Visible;
+                }
+
                 dockPanelAnswers.Children.Clear();
                 ClearXPanels();
 
@@ -385,7 +394,7 @@ namespace Server
                     DockPanel dockPanel = new DockPanel();
 
                     Label labelNumber = new Label();
-                    labelNumber.Width = 100;
+                    labelNumber.Width = 75;
                     labelNumber.Content = i + 1;
                     labelNumber.Style = (Style)FindResource("answers");
                     DockPanel.SetDock(labelNumber, Dock.Left);

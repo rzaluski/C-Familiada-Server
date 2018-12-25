@@ -7,23 +7,28 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Table">
-    <DockPanel LastChildFill="True" Background="Black">
-        <StackPanel Name="stackPanelPointsLeft" DockPanel.Dock="Left" Width="150px" Orientation="Horizontal">
-            <Label Name="labelPointsLeft" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="Yellow" Content="0" Style="{StaticResource points}"/>
+    <Grid Background="Black">
+        <StackPanel Name="stackPanelLogoText" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Label Content="FAMILIADA" FontSize="80" Foreground="Yellow" FontFamily="Resources/subway-ticker.regular.ttf#Subway Ticker"/>
         </StackPanel>
-        <StackPanel Name="stackPanelLeftX" DockPanel.Dock="Left" Width="150px" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-            
-        </StackPanel>
-        <StackPanel Name="stackPanelPointsRight" DockPanel.Dock="Right" Orientation="Horizontal" Width="150px" FlowDirection="RightToLeft">
-            <Label Name="labelPointsRight" VerticalAlignment="Center" HorizontalAlignment="Right" Content="0" Foreground="Yellow" Style="{StaticResource points}"/>
-        </StackPanel>
-        <StackPanel Name="stackPanelRightX" DockPanel.Dock="Right" Width="150px" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <DockPanel Name="dockPanelMainContent" LastChildFill="True" Background="Black" Visibility="Collapsed">
+            <StackPanel Name="stackPanelPointsLeft" DockPanel.Dock="Left" Width="150px" Orientation="Horizontal">
+                <Label Name="labelPointsLeft" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="Yellow" Content="0" Style="{StaticResource points}"/>
+            </StackPanel>
+            <StackPanel Name="stackPanelLeftX" DockPanel.Dock="Left" Width="150px" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
 
-        </StackPanel>
-        <StackPanel Name="stackPanelPointsTop" DockPanel.Dock="Top">
-            <Label Name="labelPointsTop" Foreground="Yellow" Content="0" HorizontalAlignment="Center" Style="{StaticResource points}"/>
-        </StackPanel>
-        <DockPanel Name="dockPanelAnswers" Margin="0,100,0,0" HorizontalAlignment="Center">
+            </StackPanel>
+            <StackPanel Name="stackPanelPointsRight" DockPanel.Dock="Right" Orientation="Horizontal" Width="150px" FlowDirection="RightToLeft">
+                <Label Name="labelPointsRight" VerticalAlignment="Center" HorizontalAlignment="Right" Content="0" Foreground="Yellow" Style="{StaticResource points}"/>
+            </StackPanel>
+            <StackPanel Name="stackPanelRightX" DockPanel.Dock="Right" Width="150px" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+
+            </StackPanel>
+            <StackPanel Name="stackPanelPointsTop" DockPanel.Dock="Top">
+                <Label Name="labelPointsTop" Foreground="Yellow" Content="0" HorizontalAlignment="Center" Style="{StaticResource points}"/>
+            </StackPanel>
+            <DockPanel Name="dockPanelAnswers" Margin="0,100,0,0" HorizontalAlignment="Center">
+            </DockPanel>
         </DockPanel>
-    </DockPanel>
+    </Grid>
 </Page>
