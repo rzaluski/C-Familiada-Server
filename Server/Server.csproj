@@ -115,7 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\advanced-led-board-7.regular.ttf" />
-    <None Include="Resources\trs-million.regular.ttf" />
+    <Resource Include="Resources\trs-million rg.ttf" />
     <None Include="Resources\wronganswer.wav" />
   </ItemGroup>
   <ItemGroup>

@@ -95,25 +95,26 @@ namespace Server
             while(true)
             {
                 int k = socket.Receive(b);
-                string msgString = System.Text.Encoding.ASCII.GetString(b, 0, k);
+                string msgString = System.Text.Encoding.UTF8.GetString(b, 0, k);
                 HandleMessage(msgString);
             }
         }
 
         private Question RandQuestion()
         {
+            int nextRound = _round + 1;
             List<Question> questions = null;
-            if(_round < 4)
+            if(nextRound < 4)
             {
                 questions = _questions.Where(question => question.Answers.Count >= 6).ToList();
             }
-            else if(_round == 4)
+            else if(nextRound == 4)
             {
                 questions = _questions.Where(question => question.Answers.Count < 6 && question.Answers.Count > 3).ToList();
             }
-            else if(_round > 4)
+            else if(nextRound > 4)
             {
-                questions = _questions.Where(question => question.Answers.Count == 3).ToList();
+                questions = _questions.Where(question => question.Answers.Count <= 5).ToList();
             }
 
             Random r = new Random();
@@ -217,6 +218,7 @@ namespace Server
                     {
                         _teamWonBattle = _currentAnsweringTeam;
                     }
+                    _currentAnsweringTeam = _teamWonBattle;
                     ClearXPanels();
                 }
                 else if (_correctAnswers == _currentQuestion.Answers.Count || _currentAnsweringTeam != _teamWonBattle)
@@ -260,14 +262,29 @@ namespace Server
             {
                 ShowSmallX(teamAnswered);
             }
-            if(_teamWonBattle == Team.None || _currentAnsweringTeam != _teamWonBattle)
+            if(_teamWonBattle == Team.None || (_teamWonBattle != Team.None && _currentAnsweringTeam != _teamWonBattle))
             {
                 ShowFullX();
                 _currentAnsweringTeam = GetOppositeTeam(_currentAnsweringTeam);
             }
-            if(_totalAnswers == 2 &&  _teamWonBattle == Team.None)
+            if(_totalAnswers == 2 && _teamWonBattle == Team.None)
             {
-                _totalAnswers = 0;
+                if(_correctAnswers > 0 )
+                {
+                    _teamWonBattle = GetOppositeTeam(teamAnswered);
+                    new Task(() =>
+                    {
+                        System.Threading.Thread.Sleep(3000);
+                        Dispatcher.Invoke(() =>
+                        {
+                            ClearXPanels();
+                        });
+                    }).Start();
+                }
+                else
+                {
+                    _totalAnswers = 0;
+                }
             }
             if(_incorrectAnswers == 3)
             {
@@ -391,7 +408,7 @@ namespace Server
             _teamPoints[(int)winningTeam] += _roundPoints;
             _roundPoints = 0;
             _isRoundOn = false;
-            PlaySoundWithDelay(Properties.Resources.roundsoundwithclaps, 2000);
+            PlaySoundWithDelay(Properties.Resources.roundsoundwithclaps, 1000);
         }
 
         private Team GetOppositeTeam(Team currentTeam)
@@ -419,7 +436,7 @@ namespace Server
                     Label labelNumber = new Label();
                     labelNumber.Width = 75;
                     labelNumber.Content = i + 1;
-                    labelNumber.Style = (Style)FindResource("answers");
+                    labelNumber.Style = (Style)FindResource("numbers");
                     DockPanel.SetDock(labelNumber, Dock.Left);
 
                     Grid pointsContainer = new Grid();
@@ -427,7 +444,7 @@ namespace Server
                     Label labelPoints = new Label();
                     labelPoints.Width = 100;
                     labelPoints.Content = "--";
-                    labelPoints.Style = (Style)FindResource("answers");
+                    labelPoints.Style = (Style)FindResource("numbers");
                     labelPoints.HorizontalAlignment = HorizontalAlignment.Left;
                     pointsContainer.Children.Add(labelPoints);
                     DockPanel.SetDock(pointsContainer, Dock.Right);
@@ -451,8 +468,8 @@ namespace Server
         private void SendMessage(string header, object obj)
         {
             string msgString = JMessage.CreateMessage(header, obj);
-            ASCIIEncoding asen = new ASCIIEncoding();
-            byte[] b = asen.GetBytes(msgString);
+            UTF8Encoding utf8 = new UTF8Encoding();
+            byte[] b = utf8.GetBytes(msgString);
             socket.Send(b);
         }
 
