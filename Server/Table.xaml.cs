@@ -84,6 +84,8 @@ namespace Server
             _roundPoints = 0;
             _teamWonBattle = Team.None;
             _isRoundOn = true;
+            if(_round == 4) _pointsMultiplier = 2;
+            if(_round == 5) _pointsMultiplier = 3;
             PlaySound(Properties.Resources.roundsound);
         }
 
@@ -98,13 +100,32 @@ namespace Server
             }
         }
 
+        private Question RandQuestion()
+        {
+            List<Question> questions = null;
+            if(_round < 4)
+            {
+                questions = _questions.Where(question => question.Answers.Count >= 6).ToList();
+            }
+            else if(_round == 4)
+            {
+                questions = _questions.Where(question => question.Answers.Count < 6 && question.Answers.Count > 3).ToList();
+            }
+            else if(_round > 4)
+            {
+                questions = _questions.Where(question => question.Answers.Count == 3).ToList();
+            }
+
+            Random r = new Random();
+            return questions[r.Next() % questions.Count];
+        }
+
         private void HandleMessage(string msgString)
         {
             JMessage msg = JMessage.Deserialize(msgString);
             if (msg.MessageType == "RandQuestion")
             {
-                Random r = new Random();
-                Question q = _questions[r.Next() % _questions.Count];
+                Question q = RandQuestion();
                 SendMessage("RandQuestion", q);
                 _currentQuestion = q;
             }
@@ -132,6 +153,7 @@ namespace Server
         {
             return _currentQuestion.Answers.FindIndex(c => c.AnswerText == answer.AnswerText);
         }
+
         private void ShowAnswer(int number)
         {
             Dispatcher.Invoke(() =>
@@ -165,6 +187,7 @@ namespace Server
                 myWidthAnimatedLabelStoryboard.Begin(labelPoints);
             });
         }
+
         private void ProceedCorrectAnswer(int answerNumber)
         {
             ShowAnswer(answerNumber);
@@ -194,11 +217,6 @@ namespace Server
                     {
                         _teamWonBattle = _currentAnsweringTeam;
                     }
-                    ClearXPanels();
-                }
-                else if (_teamWonBattle == Team.None)
-                {
-                    _teamWonBattle = _currentAnsweringTeam;
                     ClearXPanels();
                 }
                 else if (_correctAnswers == _currentQuestion.Answers.Count || _currentAnsweringTeam != _teamWonBattle)
@@ -246,6 +264,10 @@ namespace Server
             {
                 ShowFullX();
                 _currentAnsweringTeam = GetOppositeTeam(_currentAnsweringTeam);
+            }
+            if(_totalAnswers == 2 &&  _teamWonBattle == Team.None)
+            {
+                _totalAnswers = 0;
             }
             if(_incorrectAnswers == 3)
             {
