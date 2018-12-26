@@ -114,7 +114,7 @@ namespace Server
             }
             else if(nextRound > 4)
             {
-                questions = _questions.Where(question => question.Answers.Count <= 5).ToList();
+                questions = _questions.Where(question => question.Answers.Count == 3).ToList();
             }
 
             Random r = new Random();
