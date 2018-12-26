@@ -364,13 +364,12 @@ namespace Server
             }).Start();
         }
 
-
         private void EndRound(Team winningTeam)
         {
             _teamPoints[(int)winningTeam] += _roundPoints;
             _roundPoints = 0;
             _isRoundOn = false;
-            PlaySoundWithDelay(Properties.Resources.roundsound, 2000);
+            PlaySoundWithDelay(Properties.Resources.roundsoundwithclaps, 2000);
         }
 
         private Team GetOppositeTeam(Team currentTeam)
