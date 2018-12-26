@@ -61,6 +61,16 @@ namespace Server.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] advanced_led_board_7_regular {
+            get {
+                object obj = ResourceManager.GetObject("advanced_led_board_7_regular", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap bigX {

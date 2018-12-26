@@ -5,12 +5,14 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <Style x:Key="answers">
-            <Setter Property="TextElement.FontFamily" Value="Resources/subway-ticker.regular.ttf#Subway Ticker"/>
+            <!--<Setter Property="TextElement.FontFamily" Value="Resources/subway-ticker.regular.ttf#Subway Ticker"/>-->
+            <Setter Property="TextElement.FontFamily" Value="Resources/advanced-led-board-7.regular#Advanced LED Board-7"/>
             <Setter Property="TextElement.FontSize" Value="50"/>
             <Setter Property="TextElement.Foreground" Value="Yellow"/>
         </Style>
         <Style x:Key="points">
-            <Setter Property="TextElement.FontFamily" Value="Resources/subway-ticker.regular.ttf#Subway Ticker"/>
+            <!--<Setter Property="TextElement.FontFamily" Value="Resources/subway-ticker.regular.ttf#Subway Ticker"/>-->
+            <Setter Property="TextElement.FontFamily" Value="Resources/advanced-led-board-7.regular#Advanced LED Board-7"/>
             <Setter Property="TextElement.FontSize" Value="70"/>
             <Setter Property="TextElement.Foreground" Value="Yellow"/>
         </Style>
