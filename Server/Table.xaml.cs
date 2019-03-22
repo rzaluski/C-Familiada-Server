@@ -223,7 +223,6 @@ namespace Server
                 }
                 else if (_correctAnswers == _currentQuestion.Answers.Count || _currentAnsweringTeam != _teamWonBattle)
                 {
-                    _roundPoints -= pointsToAdd;
                     EndRound(_currentAnsweringTeam);
                 }
                 SendMessage("IsRoundOn", _isRoundOn);
