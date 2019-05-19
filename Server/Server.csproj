@@ -103,6 +103,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="bin\Debug\questions.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -116,6 +117,7 @@
   <ItemGroup>
     <None Include="Resources\advanced-led-board-7.regular.ttf" />
     <Resource Include="Resources\trs-million rg.ttf" />
+    <None Include="Resources\questions.json" />
     <None Include="Resources\wronganswer.wav" />
   </ItemGroup>
   <ItemGroup>

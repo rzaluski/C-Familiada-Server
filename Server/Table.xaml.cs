@@ -64,8 +64,8 @@ namespace Server
         {
             try
             {
-                string filename = @"questions.json";
-                string json = File.ReadAllText(filename);
+                var stream = new StreamReader(new MemoryStream(Properties.Resources.questions));
+                string json = stream.ReadToEnd();
                 _questions = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Question>>(json);
             }
             catch (Exception ex)
